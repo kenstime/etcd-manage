@@ -1,89 +1,49 @@
-e3w
-===
+# etcd-manage
 
-etcd v3 Web UI based on [Golang](https://golang.org/) && [React](https://facebook.github.io/react/), copy from [consul ui](https://github.com/hashicorp/consul/tree/master/ui) :)
+本项目是 [e3w](https://github.com/soyking/e3w) 的一个副本，修改了里边etcd库(etcd原来饮用地址不可以)的引入地址，和加了允许跨域请求。
 
-supporting hierarchy on etcd v3, based on [e3ch](https://github.com/shiguanghuxian/e3ch)
+## 编译和运行
 
-## Quick Start
-
-```
-git clone https://github.com/shiguanghuxian/etcd-manage.git
-cd e3w
-docker-compose up
-# open http://localhost:8080
-```
-
-Or use docker image by `docker pull soyking/e3w`, more details in `Dockerfile` and `docker-compose.yml`
-
-## Overview
-
-KEY/VALUE
-
-![](./images/kv.png)
-
-MEMBERS
-
-![](./images/members.png)
-
-ROLES
-
-![](./images/roles.png)
-
-USERS
-
-![](./images/users.png)
-
-SETTING
-
-![](./images/setting.png)
-
-## Usage
-
-1.Fetch the project `go get github.com/shiguanghuxian/etcd-manage`
+由于前端使用了vue-cli3，在docker中没有成功编译前端代码，所以需要手动编译前端代码。
 
 
-2.frontend
+***前端代码编译：***
 
-```
-cd static
-npm install
-npm run publish
-```
+>
+> 1. 安装node 
+> 
+> 		下载地址 [https://nodejs.org/](https://nodejs.org/)
+>
+> 2. 安装cnpm加速node依赖安装速度
+>
+> 		npm install -g cnpm  --registry=https://registry.npm.taobao.org
+> 
+> 3. 安装vue-cli3
+> 
+> 		cnpm install -g @vue/cli
+> 
+> 4. 安装依赖，编译项目
+>
+>  		cd $GOPATH/github.com/shiguanghuxian/etcd-manage/static
+> 
+> 		cnpm install && npm run build
+> 
 
-3.backend
+***运行***
 
-a. Start etcd, such as [goreman](https://go.etcd.io/etcd/#running-a-local-etcd-cluster)
+项目中用到的go.etcd.io/etcd库，可以从github下载[https://github.com/etcd-io/etcd](https://github.com/etcd-io/etcd)，拷贝到对应目录
 
-b. Install packages by [dep](https://github.com/golang/dep) if needed, `dep ensure`
+> 1. 安装go依赖
+> 
+> govendor add +external
+> 
+> 2. 运行
+> docker-compose up
+> 
 
-c. Edit conf/config.default.ini if needed, `go build && ./e3w`
+## 运行效果
 
-d. For auth:
+![](./images/abc.png)
 
-```
-ETCDCTL_API=3 etcdctl auth enable
-# edit conf/config.default.ini[app]#auth
-./e3w
-# you could set your username and password in SETTING page
-```
 
-4.build image
-
-Install dependencies in 3.b, then run `docker build -t soyking/e3w .`
-
-## Notice
-
-- When you want to add some permissions in directories to a user, the implement of hierarchy in [e3ch](https://github.com/shiguanghuxian/e3ch) requires you to set a directory's READ permission. For example, if role `roleA` has the permission of directory `dir1/dir2`, then it should have permissions:
-
-	```
-	KV Read:
-		dir1/dir2
-		[dir1/dir2/, dir1/dir20) (prefix dir1/dir2/)
-	KV Write:
-		[dir1/dir2/, dir1/dir20) (prefix dir1/dir2/)
-	```
-
-	When `userA` was granted `roleA`, `userA` could open the by `http://e3w-address.com/#/kv/dir1/dir2` to view and edit the key/value
-
-- Access key/value by etcdctl, [issue](https://github.com/shiguanghuxian/etcd-manage/issues/3). But the best way to access key/value is using [e3ch](https://github.com/shiguanghuxian/e3ch).
+![](./images/demo.gif)
