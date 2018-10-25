@@ -4,22 +4,10 @@ import router from './router'
 import axios from 'axios'
 import './plugins/iview.js'
 
-import VueCodemirror from 'vue-codemirror'
-// require styles
-import 'codemirror/lib/codemirror.css'
+import VueCodeMirror from 'vue-codemirror-lite'
 
-import 'codemirror/mode/javascript/javascript.js';
-import "codemirror/theme/monokai.css";
+Vue.use(VueCodeMirror)
 
-import 'codemirror/addon/hint/show-hint.css';
-import 'codemirror/addon/hint/show-hint.js';
-
-import 'codemirror/addon/hint/javascript-hint.js';
-
-Vue.use(VueCodemirror, /* { 
-  options: { theme: 'base16-dark', ... },
-  events: ['scroll', ...]
-} */)
 
 Vue.config.productionTip = false;
 

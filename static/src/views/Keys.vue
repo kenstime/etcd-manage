@@ -63,26 +63,32 @@
         </div>
 
         <!-- 查看弹框 -->
-        <Modal
+        <Drawer
+            :width="50"
             v-model="showKeyInfoModel"
-            title="配置信息"
-            @on-ok="saveKey">
+            title="配置信息">
             <Form :model="showKeyInfo" :label-width="80">
                 <FormItem label="Key" prop="key">
-                    <Input v-model="showKeyInfo.key" placeholder="配置地址"></Input>
+                    <Input v-model="showKeyInfo.key" disabled placeholder="配置地址"></Input>
                 </FormItem>
                 <FormItem label="Value" prop="value" >
-                  <codemirror ref="code" v-model="showKeyInfo.value" :options="cmOption" style="line-height:20px;"></codemirror>
-                    <!-- <Input v-model="showKeyInfo.value" type="textarea" :autosize="{minRows: 8,maxRows: 12}" placeholder="配置值"></Input> -->
+                  <!-- <codemirror ref="code" v-model="showKeyInfo.value" :options="cmOption" style="line-height:20px;"></codemirror> -->
+                    <!-- <Input v-model="showKeyInfo.value" type="textarea" :autosize="{minRows: 8,maxRows: 80}" placeholder="配置值"></Input> -->
+                  <codemirror v-model="showKeyInfo.value" style="line-height:20px;"></codemirror>
                 </FormItem>
+                <FormItem>
+                    <Button @click="saveKey" type="primary">保存</Button>
+                    <Button @click="showKeyInfoModel = false" style="margin-left: 8px">关闭</Button>
+                </FormItem>
+
             </Form>
-        </Modal>
+        </Drawer>
 
         <!-- 添加弹框 -->
-        <Modal
+        <Drawer
+            :width="50"
             v-model="addKeyInfoModel"
-            title="添加KEY"
-            @on-ok="addKey">
+            title="添加KEY">
             <Form :model="addKeyInfo" :label-width="80">
                 <FormItem label="Key" prop="key">
                     <Input v-model="addKeyInfo.key" placeholder="配置地址">
@@ -97,16 +103,28 @@
                 </FormItem>
                 
                 <FormItem label="Value" prop="value" v-show="addKeyInfo.kType == 'KEY'">
-                  <codemirror v-model="addKeyInfo.value" :options="cmOption" style="line-height:20px;"></codemirror>
-                    <!-- <Input v-model="addKeyInfo.value" type="textarea" :autosize="{minRows: 8,maxRows: 12}" placeholder="配置值"></Input> -->
+                  <!-- <codemirror v-model="addKeyInfo.value" :options="cmOption" style="line-height:20px;"></codemirror> -->
+                    <!-- <Input v-model="addKeyInfo.value" type="textarea" :autosize="{minRows: 8,maxRows: 80}" placeholder="配置值"></Input> -->
+                  <codemirror  v-model="addKeyInfo.value" style="line-height:20px;"></codemirror>
                 </FormItem>
+
+                <FormItem>
+                    <Button @click="addKey" type="primary">保存</Button>
+                    <Button @click="addKeyInfoModel = false" style="margin-left: 8px">关闭</Button>
+                </FormItem>
+
             </Form>
-        </Modal>
+        </Drawer>
 
     </div>
 </template>
 
 <script>
+require("codemirror/mode/javascript/javascript");
+require("codemirror/mode/toml/toml");
+require("codemirror/mode/yaml/yaml");
+require("codemirror/mode/xml/xml");
+
 export default {
   data() {
     return {
@@ -223,9 +241,9 @@ export default {
         styleActiveLine: true,
         lineNumbers: true,
         line: true,
-        mode: 'text/javascript',
+        mode: "text/javascript",
         lineWrapping: true,
-        extraKeys: {"Ctrl": "autocomplete"},
+        extraKeys: { Ctrl: "autocomplete" },
         theme: "monokai",
         autoRefresh: true
       }
@@ -314,6 +332,8 @@ export default {
           if (resp.data.err == "") {
             this.$Message.success("添加成功！");
             this.getKeyList();
+            this.addKeyInfo = {};
+            this.addKeyInfoModel = false;
           } else {
             this.$Message.error(resp.data.err);
           }
@@ -328,6 +348,7 @@ export default {
         .then(resp => {
           if (resp.data.err == "") {
             this.$Message.success("保存成功！");
+            this.showKeyInfoModel = false;
           } else {
             this.$Message.error(resp.data.err);
           }
