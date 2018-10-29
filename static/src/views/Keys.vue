@@ -12,8 +12,8 @@
             <!-- 路径文本框 -->
             <Input v-show="showPathInput == true" @on-enter="enterPath" v-model="currentPath" :placeholder="$t('key.currentPathTips')" style="width: 300px;margin-top:-9px;font-size:28px;" />
             <span @click="showPathInput = !showPathInput" style="font-size:15px;margin-left:5px;">
-                <Button type="primary" v-show="showPathInput == false" size="small">Edit</Button>
-                <Button type="primary" v-show="showPathInput == true" size="small">Hide</Button>
+                <Button type="primary" v-show="showPathInput == false" size="small">{{$t('public.edit')}}</Button>
+                <Button type="primary" v-show="showPathInput == true" size="small">{{$t('public.hide')}}</Button>
             </span>
 
             <Poptip style="float:right;margin-top:-3px;" placement="left-end"
