@@ -4,6 +4,16 @@ import router from './router'
 import axios from 'axios'
 import './plugins/iview.js'
 
+import VueI18n from 'vue-i18n';
+import en from 'iview/dist/locale/en-US';
+import zh from 'iview/dist/locale/zh-CN';
+
+import myen from './i18n/en-US';
+import myzh from './i18n/zh-CN';
+
+Vue.use(VueI18n);
+
+// 编辑器
 import VueCodeMirror from 'vue-codemirror-lite'
 
 Vue.use(VueCodeMirror)
@@ -11,10 +21,10 @@ Vue.use(VueCodeMirror)
 
 Vue.config.productionTip = false;
 
+/* axios */
 // axios.defaults.baseURL = 'http://127.0.0.1:9090';
 
 // 请求拦截器
-
 axios.interceptors.request.use(function (config) {
   // 读取本地是否存在用户信息
   let etcdUserStr = localStorage.getItem('etcdUser');
@@ -36,7 +46,24 @@ axios.interceptors.request.use(function (config) {
 
 Vue.prototype.$http = axios;
 
+// 语言
+Vue.locale = () => {};
+
+const messages = {
+    en: Object.assign(myen, en),
+    zh: Object.assign(myzh, zh)
+};
+
+let mylang = localStorage.getItem("lang") || 'en';
+
+// Create VueI18n instance with options
+const i18n = new VueI18n({
+    locale: mylang,  // set locale
+    messages  // set locale messages
+});
+
 new Vue({
   router,
+  i18n,
   render: h => h(App)
 }).$mount('#app')

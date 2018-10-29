@@ -12,7 +12,7 @@
             </Input>
         </FormItem>
         <FormItem>
-            <Button type="primary" @click="save()">保存</Button>
+            <Button type="primary" @click="save()">{{$t('public.save')}}</Button>
         </FormItem>
     </Form>
     </div>

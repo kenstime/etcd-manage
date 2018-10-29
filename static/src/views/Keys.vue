@@ -10,29 +10,34 @@
             </span>
             
             <!-- 路径文本框 -->
-            <Input v-show="showPathInput == true" @on-enter="enterPath" v-model="currentPath" placeholder="key路径，只能是路径不能是值" style="width: 300px;margin-top:-9px;font-size:28px;" />
+            <Input v-show="showPathInput == true" @on-enter="enterPath" v-model="currentPath" :placeholder="$t('key.currentPathTips')" style="width: 300px;margin-top:-9px;font-size:28px;" />
             <span @click="showPathInput = !showPathInput" style="font-size:15px;margin-left:5px;">
-                <span v-show="showPathInput == false">编辑</span>
-                <span v-show="showPathInput == true">隐藏</span>
+                <Button type="primary" v-show="showPathInput == false" size="small">Edit</Button>
+                <Button type="primary" v-show="showPathInput == true" size="small">Hide</Button>
             </span>
 
             <Poptip style="float:right;margin-top:-3px;" placement="left-end"
                 confirm
-                title="确定删除选中的key？"
+                :title="$t('key.delConfirm')"
                 @on-ok="delKeys">
-            <Button  type="error">删除选中</Button>
+            <Button  type="error">{{$t('public.multiDelete')}}</Button>
             </Poptip>
 
-            <Button type="success" @click="addKeyInfoModel = true;addKeyInfo = {kType:'KEY'}" style="float:right;margin-right:6px;">添加</Button>
+            <Button type="success" @click="addKeyInfoModel = true;addKeyInfo = {kType:'KEY'}" style="float:right;margin-right:6px;">{{$t('public.add')}}</Button>
+            <!-- 语言 -->
+            <RadioGroup v-model="lang" @on-change="changeLang" type="button" style="float:right;margin-right:6px;">
+                <Radio label="en">EN</Radio>
+                <Radio label="zh">ZH</Radio>
+            </RadioGroup>
             <!-- 展示方式切换 -->
-            <RadioGroup v-model="listType" @on-change="selectionKeys=[]" type="button" style="float:right;margin-right:6px;">
+            <RadioGroup v-model="listType" @on-change="changeListType" type="button" style="float:right;margin-right:6px;">
                 <Radio label="grid"><Icon type="md-grid" /></Radio>
                 <Radio label="list"><Icon type="ios-list-box-outline" /></Radio>
             </RadioGroup>
 
         </div>
 
-        <div v-if="keysList.length == 0">没有子级列表</div>
+        <div v-if="keysList.length == 0 && listType == 'grid'">{{$t('key.notSubKey')}}</div>
 
         <div class="lists">
 
@@ -66,10 +71,10 @@
         <Drawer
             :width="50"
             v-model="showKeyInfoModel"
-            title="配置信息">
+            :title="$t('key.editKey')">
             <Form :model="showKeyInfo" :label-width="80">
                 <FormItem label="Key" prop="key">
-                    <Input v-model="showKeyInfo.key" disabled placeholder="配置地址"></Input>
+                    <Input v-model="showKeyInfo.key" disabled placeholder="key"></Input>
                 </FormItem>
                 <FormItem label="Value" prop="value" >
                   <!-- <codemirror ref="code" v-model="showKeyInfo.value" :options="cmOption" style="line-height:20px;"></codemirror> -->
@@ -77,8 +82,8 @@
                   <codemirror v-model="showKeyInfo.value" style="line-height:20px;"></codemirror>
                 </FormItem>
                 <FormItem>
-                    <Button @click="saveKey" type="primary">保存</Button>
-                    <Button @click="showKeyInfoModel = false" style="margin-left: 8px">关闭</Button>
+                    <Button @click="saveKey" type="primary">{{$t('public.save')}}</Button>
+                    <Button @click="showKeyInfoModel = false" style="margin-left: 8px">{{$t('public.close')}}</Button>
                 </FormItem>
 
             </Form>
@@ -88,14 +93,14 @@
         <Drawer
             :width="50"
             v-model="addKeyInfoModel"
-            title="添加KEY">
+            :title="$t('key.addKey')">
             <Form :model="addKeyInfo" :label-width="80">
                 <FormItem label="Key" prop="key">
-                    <Input v-model="addKeyInfo.key" placeholder="配置地址">
+                    <Input v-model="addKeyInfo.key" placeholder="key">
                         <span slot="prepend">{{currentPath}}/</span>
                     </Input>
                 </FormItem>
-                <FormItem label="kType" prop="kType">
+                <FormItem label="KeyType" prop="kType">
                     <RadioGroup v-model="addKeyInfo.kType">
                         <Radio label="KEY"></Radio>
                         <Radio label="DIR"></Radio>
@@ -109,8 +114,8 @@
                 </FormItem>
 
                 <FormItem>
-                    <Button @click="addKey" type="primary">保存</Button>
-                    <Button @click="addKeyInfoModel = false" style="margin-left: 8px">关闭</Button>
+                    <Button @click="addKey" type="primary">{{$t('public.save')}}</Button>
+                    <Button @click="addKeyInfoModel = false" style="margin-left: 8px">{{$t('public.close')}}</Button>
                 </FormItem>
 
             </Form>
@@ -128,6 +133,7 @@ require("codemirror/mode/xml/xml");
 export default {
   data() {
     return {
+      lang:'en',
       showPathInput: false, // 是否显示路径文本框
       listType: "grid", // 显示方式
       paths: [
@@ -183,7 +189,7 @@ export default {
           key: "key"
         },
         {
-          title: "操作",
+          title: " ",
           align: "center",
           render: (h, params) => {
             return h("div", [
@@ -203,7 +209,7 @@ export default {
                     }
                   }
                 },
-                params.row.is_dir == true ? "打开" : "查看"
+                params.row.is_dir == true ? this.$t('key.open') : this.$t('key.show')
               ),
               h(
                 "Poptip",
@@ -227,7 +233,7 @@ export default {
                         size: "small"
                       }
                     },
-                    "删除"
+                    this.$t('public.delete')
                   )
                 ]
               )
@@ -250,6 +256,8 @@ export default {
     };
   },
   mounted() {
+    this.lang = localStorage.getItem('lang') || 'en';
+    this.listType = localStorage.getItem("list_type") || 'grid';
     this.getKeyList();
   },
   methods: {
@@ -407,7 +415,20 @@ export default {
           this.$Message.error(resp.data.err);
         }
       });
+    },
+
+    // 展现方式
+    changeListType(){
+      localStorage.setItem("list_type", this.listType || 'grid');
+    },
+
+    // 切换语言
+    changeLang(){
+      this.$i18n.locale = this.lang || 'en';
+      localStorage.setItem("lang", this.lang || 'en');
     }
+
+
   }
 };
 </script>
@@ -474,6 +495,10 @@ export default {
 
 .keys .lists .table-list-main {
   margin-top: 10px;
+}
+
+.ivu-poptip-body-message{
+  display: inline-block !important;
 }
 
 </style>
