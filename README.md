@@ -44,8 +44,17 @@
 > 
 
 ## 运行效果
-
+首页
 ![](./images/abc.png)
 
+列表形式显示
+![](./images/list.png)
 
-![](./images/demo.gif)
+添加
+![](./images/add.png)
+
+删除
+![](./images/del.png)
+
+查看&修改
+![](./images/show.png)
