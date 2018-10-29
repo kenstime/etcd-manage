@@ -105,7 +105,7 @@
                 <FormItem label="Value" prop="value" v-show="addKeyInfo.kType == 'KEY'">
                   <!-- <codemirror v-model="addKeyInfo.value" :options="cmOption" style="line-height:20px;"></codemirror> -->
                     <!-- <Input v-model="addKeyInfo.value" type="textarea" :autosize="{minRows: 8,maxRows: 80}" placeholder="配置值"></Input> -->
-                  <codemirror  v-model="addKeyInfo.value" style="line-height:20px;"></codemirror>
+                  <codemirror v-model="addKeyInfo.value" :options="{mode: 'javascript'}" style="line-height:20px;border: 1px solid #dcdee2"></codemirror>
                 </FormItem>
 
                 <FormItem>
@@ -314,7 +314,7 @@ export default {
 
     // 添加key
     addKey() {
-      if (this.addKeyInfo.key == "") {
+      if (this.addKeyInfo.key == "" || typeof this.addKeyInfo.key == "undefined") {
         this.$Message.warning("key不能为空");
         return;
       }
@@ -358,7 +358,7 @@ export default {
     // 删除key
     delKeys() {
       this.keysList.forEach((val, index) => {
-        console.log(val._checked);
+        // console.log(val._checked);
         if (val.check == true && this.listType == "grid") {
           this.delOneKey(val.key);
         }
@@ -367,6 +367,7 @@ export default {
         this.selectionKeys.forEach(val => {
           this.delOneKey(val.key);
         });
+        this.selectionKeys = [];
       }
     },
 
@@ -392,13 +393,18 @@ export default {
       this.$http.get(`/kv${k}?list`).then(resp => {
         if (resp.data.err == "") {
           this.keysList = resp.data.result;
-          this.keysList.forEach(val => {
+          this.keysList.forEach((val,kkk) => {
+            
             val.check = false;
             val._checked = false;
             let subarr = val.key.substring(1).split("/");
             val.path = subarr[subarr.length - 1];
+
+            this.$set(this.keysList,kkk, val);
             console.log(val);
           });
+        }else{
+          this.$Message.error(resp.data.err);
         }
       });
     }

@@ -2,6 +2,8 @@
 
 本项目是 [e3w](https://github.com/soyking/e3w) 的一个副本，修改了里边etcd库(etcd原来饮用地址不可以)的引入地址，和加了允许跨域请求。
 
+可以使用我编写的docker-compose，快速在docker中启动etcd3管理界面 地址: [https://github.com/shiguanghuxian/docker-compose/tree/master/etcd33](https://github.com/shiguanghuxian/docker-compose/tree/master/etcd33)
+
 ## 编译和运行
 
 由于前端使用了vue-cli3，在docker中没有成功编译前端代码，所以需要手动编译前端代码。
