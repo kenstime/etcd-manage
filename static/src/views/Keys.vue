@@ -59,8 +59,13 @@
 
             <!-- 表格形式展示 -->
             <div class="table-list-main" v-if="listType == 'list'">
-                <Table border :columns="columnsKey" :data="keysList" @on-selection-change="selectionChangeKeys"></Table>
+              <Table border :columns="columnsKey" :data="keysList1" @on-selection-change="selectionChangeKeys"></Table>
+              <div style="margin-top:10px; width:100%;">
+                <Page style="margin:0px auto;float: right;margin-right:100px;" @on-change="changeListPage" @on-page-size-change="pageSizeChange" show-sizer :current="page" :page-size="pageSize" :total="listTotal" />
+              </div>
             </div>
+
+            <div style="height:100px;"></div>
 
 
             <div style="clear:both"></div>
@@ -133,6 +138,9 @@ require("codemirror/mode/xml/xml");
 export default {
   data() {
     return {
+      listTotal:0, // 总条数
+      pageSize:10, // 默认10条
+      page:1,
       lang:'en',
       showPathInput: false, // 是否显示路径文本框
       listType: "grid", // 显示方式
@@ -152,6 +160,7 @@ export default {
       selectionKeys: [], // 表格选中列表
 
       keysList: [],
+      keysList1:[], // 分页使用
 
       columnsKey: [
         // 表格形式展示表头
@@ -401,6 +410,7 @@ export default {
       this.$http.get(`/kv${k}?list`).then(resp => {
         if (resp.data.err == "") {
           this.keysList = resp.data.result;
+          this.listTotal = this.keysList.length;
           this.keysList.forEach((val,kkk) => {
             
             val.check = false;
@@ -411,6 +421,8 @@ export default {
             this.$set(this.keysList,kkk, val);
             console.log(val);
           });
+          this.changeListPage(1);
+          this.page = 1;
         }else{
           this.$Message.error(resp.data.err);
         }
@@ -420,12 +432,29 @@ export default {
     // 展现方式
     changeListType(){
       localStorage.setItem("list_type", this.listType || 'grid');
+      this.changeListPage(1);
+      this.page = 1;
     },
 
     // 切换语言
     changeLang(){
       this.$i18n.locale = this.lang || 'en';
       localStorage.setItem("lang", this.lang || 'en');
+    },
+
+    // 切换页码
+    changeListPage(page){
+      // pageSize
+      this.keysList1.splice(0, this.keysList1.length);
+      this.keysList1=this.keysList.slice((page - 1) * this.pageSize,page * this.pageSize);
+      console.log(page);
+    },
+
+    // 页面打小
+    pageSizeChange(pageSize){
+      this.pageSize = pageSize;
+      this.changeListPage(1);
+      this.page = 1;
     }
 
 
@@ -437,7 +466,8 @@ export default {
 .keys {
   width: 100%;
   height: 100vh;
-  overflow: hidden;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 .keys .path {
   width: 100%;
